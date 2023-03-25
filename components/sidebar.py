@@ -9,7 +9,14 @@ from datetime import datetime, date
 import plotly.express as px
 import numpy as np
 import pandas as pd
+from globals import *
 
+
+df_cat_receita = pd.read_csv("df_cat_receitas.csv")
+cat_receita = df_cat_receita['Categoria'].tolist()
+
+df_cat_despesa = pd.read_csv("df_cat_despesas.csv")
+cat_despesa = df_cat_despesa['Categoria'].tolist()
 
 # ========= Layout ========= #
 layout = dbc.Col([
@@ -46,7 +53,7 @@ layout = dbc.Col([
                 ], width=6),
                 dbc.Col([
                     dbc.Label('Valor: '),
-                    dbc.Input(placeholder="R$100,00", id="txt-valor"),
+                    dbc.Input(placeholder="R$100,00", id="valor_receita"),
                 ], width=6)
             ]),
 
@@ -63,15 +70,17 @@ layout = dbc.Col([
                 dbc.Col([
                     dbc.Label("Extras"),
                     dbc.Checklist(
-                        options=[],
-                        value=[],
+                        options=[{"label": "Foi recebida", "value": 1},
+                                        {"label": "Receita Recorrente", "value": 2}],
+                        value=[1],
                         id='switches-input-receita',
                         switch=True)
                 ], width=4),
                 dbc.Col([
                     html.Label('Categoria da receita'),
-                    dbc.Select(id='select-receita',
-                               options=[], value=[])
+                    dbc.Select(id='select_receita',
+                               options=[{'label': i, 'value': i} for i in cat_receita],
+                                value=[cat_receita[0]])
                 ], width=4)
             ], style={'margin-top': '25px'}),
             dbc.Row([
@@ -161,7 +170,8 @@ layout = dbc.Col([
                 dbc.Col([
                     html.Label('Categoria da despesa'),
                     dbc.Select(id='select-despesa',
-                               options=[], value=[])
+                               options=[{'label': i, 'value': i} for i in cat_despesa],
+                                value=[cat_despesa[0]])
                 ], width=4)
             ], style={'margin-top': '25px'}),
             dbc.Row([
@@ -241,6 +251,38 @@ def toggle_modal(n1, is_open):
     Input('open-novo-despesa', 'n_clicks'),
     State('modal-novo-despesa', 'is_open')
 )
-def toggle_modal(n2, is_open):
-    if n2:
+def toggle_modal(n1, is_open):
+    if n1:
         return not is_open
+
+# Enviar Form receita    
+@app.callback(
+    Output('store-receitas', 'data'),
+    Input('salvar_receita', 'n_clicks'),
+    [
+        State('txt-receita','value'),
+        State('valor_receita','value'),
+        State('date-receitas','date'),
+        State('switches-input-receita','value'),
+        State('select_receita','value'),
+        State('store-receitas','data')
+    ]
+)
+def salve_form_receitas(n, descricao, valor, date, switches, categoria, dict_receitas):
+    import pdb
+    pdb.set_trace()
+    
+    df_receitas = pd.DataFrame(dict_receitas)
+    if n and not(valor == "" or valor == None):
+        valor = round(float(valor),2)
+        date = pd.to_datetime(date).date()
+        categoria = categoria[0]
+        recebido = 1 if 1 in switches else 0
+        fixo = 1 if 1 in switches else 0
+
+        df_receitas.loc[df_receitas.shape[0]] = [valor, recebido, fixo, date, categoria, descricao]
+
+        return {}
+    
+def add_category(n, n2, txt, check_delete, data):
+    cat_receita = list(data["Categoria"].values())

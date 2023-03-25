@@ -16,8 +16,8 @@ else:
     }
     df_receitas = pd.DataFrame(data_structure)
     df_despesas = pd.DataFrame(data_structure)
-    df_receitas.to_csv("df_receitas.csv",sep=';')
-    df_despesas.to_csv("df_despesas.csv",sep=';')
+    df_receitas.to_csv("df_receitas.csv")
+    df_despesas.to_csv("df_despesas.csv")
 
 
 if ("df_cat_despesas.csv" in os.listdir()) and ("df_cat_receitas.csv" in os.listdir()):
@@ -32,5 +32,5 @@ else:
     cat_despesa = {'Categoria':["Alimentação","Aluguel","Gasolina","Saúde","Lazer","Viagem"]}
     df_cat_receitas = pd.DataFrame(cat_receita)
     df_cat_despesas = pd.DataFrame(cat_despesa)
-    df_cat_receitas.to_csv("df_cat_receitas.csv",sep=';')
-    df_cat_despesas.to_csv("df_cat_despesas.csv",sep=';')
+    df_cat_receitas.to_csv("df_cat_receitas.csv")
+    df_cat_despesas.to_csv("df_cat_despesas.csv")
